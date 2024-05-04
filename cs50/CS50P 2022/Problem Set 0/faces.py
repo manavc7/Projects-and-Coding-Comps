@@ -1,3 +1,4 @@
+#program where the user inputs a sentence and any use of :) or :( are replaced by 🙂 or 🙁 respectively
 def convert(sentence):
     words = sentence.split()
     emojis = {
