@@ -1,3 +1,4 @@
+#program that prompts the user for the name of a file and then outputs that file’s media type 
 file = input("File name: ")
 file = file.strip()
 
