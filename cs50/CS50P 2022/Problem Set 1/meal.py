@@ -1,3 +1,4 @@
+#program that prompts the user for a time and outputs whether it’s breakfast time, lunch time, or dinner time.
 def main():
     time = input("What time is it? ")
     hours = convert(time)
