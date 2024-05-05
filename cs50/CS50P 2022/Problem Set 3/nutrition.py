@@ -1,3 +1,5 @@
+#program that prompts users to input a fruit (case-insensitively) and then outputs the number of calories in one portion of that fruit,
+
 def main():
     fruit = input("Item: ")
     if fruit.lower() == 'apple':
