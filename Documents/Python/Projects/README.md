@@ -1,7 +1,9 @@
 **Stock Market Direction Prediction**
+
 This project is focused on predicting whether stock indices (like the S&P 500) or individual stocks will increase or decrease in value the next trading day. The model combines historical market data with machine learning techniques to make informed predictions.
 
-Project Overview
+**Project Overview**
+
 Data Source: Utilizes historical data from Yahoo Finance for the S&P 500 index (^GSPC), including features like open, close, high, low prices, and trading volume.
 Modeling Approach: Implements an ensemble learning approach combining a RandomForestClassifier and XGBoost (XGBClassifier) through a VotingClassifier. This method leverages the strengths of both models for improved prediction accuracy.
 Feature Engineering: Generates additional predictors using rolling averages and trend indicators over multiple time horizons, enhancing the model's ability to capture market patterns.
