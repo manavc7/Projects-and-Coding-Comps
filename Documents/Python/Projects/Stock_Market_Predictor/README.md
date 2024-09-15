@@ -5,7 +5,10 @@ This project is focused on predicting whether stock indices (like the S&P 500) o
 # Project Overview
 
 ## Data Source:
-Utilizes historical data from Yahoo Finance for the S&P 500 index (^GSPC), including features like open, close, high, low prices, and trading volume. Modeling Approach: Implements an ensemble learning approach combining a RandomForestClassifier and XGBoost (XGBClassifier) through a VotingClassifier. This method leverages the strengths of both models for improved prediction accuracy. Feature Engineering: Generates additional predictors using rolling averages and trend indicators over multiple time horizons, enhancing the model's ability to capture market patterns.
+I used historical data from Yahoo Finance for the S&P 500 index (^GSPC), including features like open, close, high, low prices, and trading volume. 
+
+## Modelling
+For my modelling approach I implemented an ensemble learning approach combining a RandomForestClassifier and XGBoost through a VotingClassifier. This method leveraged the strengths of both models for improved prediction accuracy. It generates additional predictors using rolling averages and trend indicators over multiple time horizons, enhancing the model's ability to capture market patterns.
 
 ## Backtesting:
 The model is rigorously backtested over historical data to evaluate its performance, with results showing promising accuracy in predicting market direction. Key Results Precision Score: The ensemble model achieved higher precision compared to individual models, demonstrating its effectiveness in predicting market trends. Ensemble Strategy: By combining the RandomForest and XGBoost models, the ensemble approach reduces overfitting and improves generalization across different market conditions. Usage
