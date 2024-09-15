@@ -1,4 +1,4 @@
-### Stock Market Direction Prediction
+# Stock Market Direction Prediction
 
 This project is focused on predicting whether stock indices (like the S&P 500) or individual stocks will increase or decrease in value the next trading day. The model combines historical market data with machine learning techniques to make informed predictions.
 
