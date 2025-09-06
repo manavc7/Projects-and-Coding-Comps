@@ -1,0 +1,85 @@
+/* math_game.tcss */
+
+/* Center everything on the screen */
+Screen {
+    align-horizontal: center;
+    align-vertical: middle;
+}
+
+/* Container for game widgets */
+#game_container {
+    layout: grid;
+    grid-size: 1;
+    width: 50;
+    grid-gutter: 1;
+    border: heavy white;
+    padding: 1 2;
+}
+
+/* Problem display */
+#problem_display {
+    width: 100%;
+    text-align: center;
+    padding: 1;
+    border: round magenta;
+    color: black;
+    background: white;
+    text-style: bold;
+}
+
+/* Score + Timer */
+#score_display, #time_display {
+    text-align: center;
+    color: yellow;
+    text-style: bold;
+    padding: 1;
+}
+
+/* Answer input box */
+#answer_input {
+    width: 20;
+    border: round green;
+    padding: 0 1;
+}
+
+/* General button styling */
+Button {
+    margin: 1;
+    width: 25;
+    text-align: center;
+}
+
+/* Start button special styling */
+#start_button {
+    background: green;
+    color: black;
+    text-style: bold;
+    border: round green;
+}
+
+/* Game over container */
+#game_over_container {
+    align-horizontal: center;
+    align-vertical: middle;
+    border: double red;
+    padding: 2;
+}
+
+/* Final message */
+#final_message {
+    text-align: center;
+    text-style: bold;
+    color: green;
+    margin: 1 0;
+}
+
+/* Button hover + focus states */
+Button:hover {
+    background: cyan;
+    color: black;
+}
+
+Button:focus {
+    background: red;
+    color: white;
+}
