@@ -58,10 +58,10 @@ When the timer ends, your score is saved and you can view highscores (stored usi
 
 
 ### Setup Screen
-![Setup Screen](/Users/manavchakravarthy/Documents/Python/Projects/Mini Projects/MathGame/Screenshot 2025-09-06 at 12.30.39.png)
+![Setup Screen](setup/Screenshot 2025-09-06 at 12.30.39.png)
 
 ### Game Screen
-![Game Screen](/Users/manavchakravarthy/Documents/Python/Projects/Mini Projects/MathGame/Screenshot 2025-09-06 at 12.30.53.png)
+![Game Screen](setup/Screenshot 2025-09-06 at 12.30.53.png)
 
 ### Game Over
-![Game Over](/Users/manavchakravarthy/Documents/Python/Projects/Mini Projects/MathGame/Screenshot 2025-09-06 at 12.32.38.png)
+![Game Over](setup/Screenshot 2025-09-06 at 12.32.38.png)
