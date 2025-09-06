@@ -65,3 +65,10 @@ When the timer ends, your score is saved and you can view highscores (stored usi
 
 ### High Scores
 ![High Scores](screenshots/highscore.png)
+
+
+## Project Structure
+├── math_game.py       # Main game code
+├── math_game.tcss     # Textual CSS (styling of the UI)
+├── high_scores.json   # Stores best scores (auto-created)    
+└── README.md          # Project documentation (THIS FILE)
