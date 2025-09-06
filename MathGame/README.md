@@ -58,10 +58,10 @@ When the timer ends, your score is saved and you can view highscores (stored usi
 
 
 ### Setup Screen
-![Setup Screen](setup/Screenshot 2025-09-06 at 12.30.39.png)
+![Setup Screen](screenshots/setup)
 
 ### Game Screen
-![Game Screen](setup/Screenshot 2025-09-06 at 12.30.53.png)
+![Game Screen](screenshots/game)
 
-### Game Over
-![Game Over](setup/Screenshot 2025-09-06 at 12.32.38.png)
+### High Scores
+![High Scores](screenshots/highscore)
