@@ -54,6 +54,19 @@ Answer math questions before the timer runs out!
 
 When the timer ends, your score is saved and you can view highscores (stored using JSON).
 
+## Project Structure
+
+.
+├── math_game.py       # Main game code
+├── math_game.tcss     # Textual CSS (styling of the UI)
+├── screenshots/       # Screenshots for README (you need to add this)
+│   ├── setup.png
+│   ├── game.png
+│   └── gameover.png
+├── high_scores.json   # Stores best scores (auto-created)    
+└── README.md          # Project documentation (THIS FILE)
+
+
 ## Pictures from the Game
 
 
@@ -66,9 +79,3 @@ When the timer ends, your score is saved and you can view highscores (stored usi
 ### High Scores
 ![High Scores](screenshots/highscore.png)
 
-
-## Project Structure
-├── math_game.py       # Main game code
-├── math_game.tcss     # Textual CSS (styling of the UI)
-├── high_scores.json   # Stores best scores (auto-created)    
-└── README.md          # Project documentation (THIS FILE)
