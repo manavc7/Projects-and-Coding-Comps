@@ -56,16 +56,17 @@ When the timer ends, your score is saved and you can view highscores (stored usi
 
 ## Project Structure
 
+```text
 .
-├── math_game.py       # Main game code
-├── math_game.tcss     # Textual CSS (styling of the UI)
-├── screenshots/       # Screenshots for README (you need to add this)
+├── math_game.py        # Main game code
+├── math_game.tcss      # Textual CSS (styling of the UI)
+├── screenshots/        # Screenshots for README
 │   ├── setup.png
 │   ├── game.png
 │   └── gameover.png
-├── high_scores.json   # Stores best scores (auto-created)    
-└── README.md          # Project documentation (THIS FILE)
-
+├── high_scores.json    # Stores best scores (auto-created)
+└── README.md           # Project documentation (THIS FILE)
+```
 
 ## Pictures from the Game
 
@@ -78,4 +79,10 @@ When the timer ends, your score is saved and you can view highscores (stored usi
 
 ### High Scores
 ![High Scores](screenshots/highscore.png)
+
+
+
+## License
+
+This project is licensed under the MIT License.
 
