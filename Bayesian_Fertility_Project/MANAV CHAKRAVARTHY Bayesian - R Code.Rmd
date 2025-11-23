@@ -1,0 +1,488 @@
+---
+title: "Assessed Coursework 2"
+author: "Manav Chakravarthy"
+date: "2025-04-02"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+    fig_width: 4.0
+    fig_height: 3.5
+    extra_dependencies: ["scrextend"]
+header-includes:
+  - \usepackage[fontsize=11pt]{scrextend}  # Sets font size
+  - \linespread{1}  # Sets line spacing
+---
+
+```{r setup, include=FALSE}
+library(BayesFactor)
+library(MASS)
+
+knitr::opts_chunk$set(echo = TRUE)
+
+data(swiss)
+
+set.seed(123)
+
+n <- nrow(swiss)  # Total rows (47)
+train_size <- floor(0.70 * n)  # 70% of 47 = 33
+
+train_indices <- sample(seq_len(n), size = train_size)
+
+train_set <- swiss[train_indices, ]
+test_set <- swiss[-train_indices, ]
+
+dim(train_set)  # Should be 33 rows, 6 columns
+dim(test_set)   # Should be 14 rows, 6 columns
+
+```
+
+
+## Summary of Train Data
+```{r swiss, echo=FALSE}
+summary(train_set)
+```
+
+All modelling in the following tasks will be done using Bayesian Normal Linear models as follows:
+
+
+$$ \beta | \sigma^2 \sim N(0, 100I_p)$$ and $$\sigma^2 \sim IG(2, 2)$$
+  
+
+## Question 1
+
+### Exploratory Analysis
+
+
+#### Scatterplot and Correlation Analysis
+
+I will use a scatterplot to explore the relationship between Examination and Fertility.
+
+
+```{r scatterplot, echo=FALSE}
+
+plot(train_set$Examination, train_set$Fertility,
+     main = "Scatterplot of Examination vs Fertility",
+     xlab = "Examination", ylab = "Fertility",
+     col = "blue", pch = 16)
+abline(lm(Fertility ~ Examination, data = train_set), col = "red", lwd = 2)
+
+```
+
+#### Correlation coefficient
+
+The correlation coefficient: `r cor(train_set$Examination, train_set$Fertility)`
+
+We can see that there is a significant correlation between Fertility and Examination. This also appears to be a negative correlation.
+
+
+### Fitting the Bayesian Normal Linear Model 
+
+In our model, We recall that the prior distributions are as follows:
+
+\[
+\beta | \sigma^2 \sim N(0, 100I_p)
+\]
+
+\[
+\sigma^2 \sim IG(2, 2)
+\]
+
+For the Bayesian Normal linear model, we select:
+$$
+Y = \beta0\ + \beta1X + \epsilon,    \epsilon \sim N (0,\sigma^2)
+$$
+Where:
+  - Y (dependent variable) is Fertility  
+  - X (independent variable) is Examination  
+  - $\beta_0$ and $\beta_1$ are regression coefficients  
+  - $\sigma^2$ is the variance of the error term, $\epsilon$
+
+
+### Model Posterior
+
+The posterior is represented by the distribution of $\beta$ and $\sigma^2$ given the data as well as the prior and the likelihood function and is calculated using Bayes' Theorem.
+
+
+
+```{r selectedmodelposterior, echo=FALSE}
+set.seed(234)
+model <- lmBF(Fertility ~ Examination, data = train_set)
+posterior_samples <- posterior(model, iterations = 100)
+
+x_bar <- mean(train_set$Examination)
+beta0_samples <- posterior_samples[,"mu"] - posterior_samples[,"Examination"] * x_bar
+beta1_samples <- posterior_samples[,"Examination"]
+sig2_samples <- posterior_samples[,"sig2"]
+```
+
+The posterior distribution is proportional to the likelihood function multiplied by the prior distributions of the model parameters. It can be expressed as:
+$$
+P(\beta_0, \beta_1, \sigma^2 \mid \text{data}) \propto P(\text{data} \mid \beta_0, \beta_1, \sigma^2) \cdot P(\beta_0) \cdot P(\beta_1) \cdot P(\sigma^2) 
+$$
+Where:
+$$P(\text{data} \mid \beta_0, \beta_1, \sigma^2)$$ is is the likelihood function. 
+
+$$P(\beta_0), P( \text{Examination}), P(\sigma^2)$$
+are the prior distributions of the relevnat parameters.
+
+$$P(\beta_0, \beta_1, \sigma^2 \mid \text{data})$$ is the posterior distribution of the model paramters.
+
+
+We calculate, using the posterior samples, the posterior distributions of our parameters
+
+
+
+#### Interpreting our posterior model
+
+##### Intercept
+
+The posterior slope ($\beta_1$) distribution has a mean of -0.97. This implies that for every 1 unit increase in Examination score for draftees, Fertility decreases by 0.97 units on average. However, the 95% confidence interval is calculated to be (-1.31, -0.44), which is quite wide but still negative. This suggests the relationship is reliable, as the direction of the slope remains consistent.
+
+##### Slope
+
+The posterior slope ($\beta_1$) distribution has a mean of -0.97. This implies that for every 1 unit increase in Examination score for draftees, Fertility decreases by 0.97 units on average. However, the 95% confidence interval is calculated to be (-1.31, -0.44), which is quite wide but still negative. This suggests the relationship is reliable, as the direction of the slope remains consistent.
+
+##### Error Variance
+
+The posterior mean of the error variance ($\sigma^2$) is 114.65. This indicates substantial unexplained variability in Fertility beyond what Examination explains, suggesting that other factors may be needed for a better model fit.
+
+
+### Sampling 10 sets of parameters
+
+```{r 10sample, echo=FALSE}
+set.seed(123)  # For reproducibility
+sampled_params <- posterior_samples[sample(nrow(posterior_samples), 10), ]
+
+plot(train_set$Examination, train_set$Fertility,
+     xlab = "Examination", ylab = "Fertility",
+     main = "10 Sampled Posterior Regression Lines",
+     pch = 16, col = "blue")
+
+for (i in 1:10) {
+  intercept_adj <- sampled_params[i, "mu"] - sampled_params[i, "Examination"] * x_bar
+  slope <- sampled_params[i, "Examination"]
+  abline(a = intercept_adj, b = slope, col = "gray50", lwd = 1.5, lty = 2)
+}
+
+mean_intercept <- mean(posterior_samples[, "mu"] - posterior_samples[, "Examination"] * x_bar)
+mean_slope <- mean(posterior_samples[, "Examination"])
+abline(a = mean_intercept, b = mean_slope, col = "red", lwd = 3)
+
+```
+
+The consistent negative slopes among sampled lines reinforce the robustness of the negative association between Examination and Fertility.
+
+
+## Question 2
+
+### Exploratory Analysis
+
+```{r plot catholic+fertil, echo=FALSE}
+plot(train_set$Catholic, train_set$Fertility,
+     main = "Scatterplot of Catholic vs Fertility",
+     xlab = "Catholic (%)",
+     ylab = "Fertility",
+     pch = 16,
+     col = "darkgreen")
+
+
+```
+
+Fertility tends to increase as the Catholic proportion increases, but the relationship is not perfectly linear — so transforming Catholic makes sense.
+
+### Catholic.Transform
+
+Since Catholic proportions are between 0 and 100, a reasonable midpoint is $\alpha = 50$.
+
+```{r ctrans catholic+fertil, echo=FALSE}
+alpha <- 50
+train_set$Catholic.Transform <- (train_set$Catholic - alpha)^2
+test_set$Catholic.Transform <- (test_set$Catholic - alpha)^2
+swiss$Catholic.Transform <- (swiss$Catholic - alpha)^2
+# Scatterplot of Catholic.Transform vs Fertility
+plot(train_set$Catholic.Transform, train_set$Fertility,
+     main = "Catholic.Transform vs Fertility",
+     xlab = "Catholic.Transform",
+     ylab = "Fertility",
+     pch = 16,
+     col = "purple")
+
+abline(lm(Fertility ~ Catholic.Transform, data = train_set), col = "red", lwd = 2)
+```
+
+Using Catholic.Transform, the relationship between transformed Catholic and Fertility appears much more linear.
+
+The correlation between Fertility and the transformed Catholic dataset is 0.5185, implying a moderately strong, positive correlation between Catholicism and Fertility rates.
+
+
+
+### Fitting the Bayesian Normal Linear Model 
+
+
+
+Following the required model:
+
+\[
+\beta | \sigma^2 \sim N(0, 100I_p)
+\]
+
+\[
+\sigma^2 \sim IG(2, 2)
+\]
+
+We now fit a Bayesian linear model with Fertility as the dependent variable and Catholic.Transform as the independent variable.
+
+
+
+```{r extracting post, echo=FALSE}
+set.seed(456)
+model_q2 <- lmBF(Fertility ~ Catholic.Transform, data = train_set)
+posterior_samples_q2 <- posterior(model_q2, iterations = 100)
+
+x_bar_catholic <- mean(train_set$Catholic.Transform)
+
+beta0_mean_q2 <- mean(posterior_samples_q2[, "mu"] - posterior_samples_q2[, "Catholic.Transform"] * x_bar_catholic)
+beta0_sd_q2   <- sd(posterior_samples_q2[, "mu"] - posterior_samples_q2[, "Catholic.Transform"] * x_bar_catholic)
+beta0_ci_q2 <- quantile(posterior_samples_q2[, "mu"] - posterior_samples_q2[, "Catholic.Transform"] * x_bar_catholic, c(0.025, 0.975))
+
+beta1_mean_q2 <- mean(posterior_samples_q2[, "Catholic.Transform"])
+beta1_sd_q2   <- sd(posterior_samples_q2[, "Catholic.Transform"])
+beta1_ci_q2 <- quantile(posterior_samples_q2[, "Catholic.Transform"], c(0.025, 0.975))
+
+sig2_mean_q2 <- mean(posterior_samples_q2[, "sig2"])
+sig2_ci_q2 <- quantile(posterior_samples_q2[, "sig2"], c(0.025, 0.975))
+```
+
+
+#### Intercept
+
+The posterior intercept ($\beta_0$) distribution has a mean of 55.38, which is the estimate of the mean fertility rate when Examination = 0. Looking at a 95% Confidence Interval, we get (43.02, 66.28). This is slightly wide, suggesting some uncertainty.
+
+
+##### Slope
+
+The posterior slope ($\beta_1$), i.e., the coefficient of Catholic.Transform, has a mean of 0.009 and a 95% credible interval of (0.0033, 0.148). This implies a slight positive correlation between Fertility and Catholic.Transform.
+
+##### Error Variance
+
+The posterior mean of the error variance ($\sigma^2$) is 138.05, indicating substantial unexplained variability in Fertility beyond what Catholic.Transform explains.
+
+### Model Fit Using Posterior Means - Scatter plots
+
+```{r postmean, echo=FALSE, fig.width=8.5, fig.height=3.2}
+par(mfrow = c(1, 3), mar = c(4, 4, 2, 1))  # 1 row, 3 plots; tight margins
+
+plot(train_set$Catholic.Transform, train_set$Fertility,
+     main = "Posterior Mean Fit", xlab = "Catholic.Transform", ylab = "Fertility",
+     pch = 16, col = "purple")
+abline(a = beta0_mean_q2, b = beta1_mean_q2, col = "red", lwd = 2)
+
+plot(train_set$Catholic.Transform, train_set$Fertility,
+     main = "Observed vs Fitted", xlab = "Catholic.Transform", ylab = "Fertility",
+     pch = 16, col = "darkgreen")
+abline(a = beta0_mean_q2, b = beta1_mean_q2, col = "red", lwd = 2)
+
+fitted_values_q2 <- beta0_mean_q2 + beta1_mean_q2 * train_set$Catholic.Transform
+residuals_q2 <- train_set$Fertility - fitted_values_q2
+plot(fitted_values_q2, residuals_q2,
+     main = "Residuals", xlab = "Fitted Values", ylab = "Residuals",
+     pch = 16, col = "purple")
+abline(h = 0, col = "black", lwd = 2)
+
+```
+
+```{r rmse calculation, echo=FALSE}
+
+rmse_q2 <- sqrt(mean(residuals_q2^2))
+
+```
+
+#### Model Fit Consideration:
+
+The regression line using the posterior mean parameters fits the training data moderately well, as seen in the Posterior Mean Fitted Model plot.
+
+The scatterplot shows a general positive trend between Catholic.Transform and Fertility, but the data points are quite spread out around the regression line, indicating some variability that the model does not fully capture.
+
+The Residual Plot for the model shows that the residuals are scattered somewhat randomly around zero, with noticeable spread and a slight fan shape. This suggests potential heteroscedasticity (i.e., non-constant variance).
+
+While there is no strong systematic pattern in the residuals, the spread suggests that predictions may be less reliable for certain ranges of fitted values.
+
+The RMSE (Root Mean Squared Error) is approximately 11.01, which is around 20% of the range of Fertility values, suggesting the model is a moderately weak fit.
+
+## Question 3
+
+### Calculate Bayes Factor between Model 1 and Model 2
+
+
+```{r q3, echo=FALSE}
+
+
+model <- lmBF(Fertility ~ Examination, data = train_set)
+model_q2 <- lmBF(Fertility ~ Catholic.Transform, data = train_set)
+
+bf_comparison <- model / model_q2
+
+
+
+```
+
+I compute the Bayes Factor to be 51.56, which strongly indicates that the Examination model (Model 1) is preferred over the Catholic.Transform model. This suggests that Examination is a much better predictor of Fertility than Catholic.Transform, providing strong evidence in favor of the Examination model.
+
+## Question 4
+
+### Model Selection
+
+```{r model select, echo=FALSE}
+bf_models <- regressionBF(Fertility ~ Agriculture + Examination + Education + Catholic + Infant.Mortality, 
+                          data = train_set, whichModels = "all")
+
+bf_sorted <- sort(bf_models, decreasing = TRUE)
+
+
+```
+Using Bayes Factor analysis, we compute the Bayes factor for all possible models using the test data.
+
+We find that the model: \[
+Fertility \sim Agriculture + Education + Catholic + Infant.Mortality
+\]
+has the highest Bayes Factor of 5317221 and is therefore the best at explaining Fertility.
+
+### Posterior Distribution for the Selected Model
+
+```{r post dist, echo=FALSE}
+final_model_bf <- lmBF(Fertility ~ Agriculture + Education + Catholic + Infant.Mortality, 
+                       data = train_set)
+
+posterior_samples_final <- posterior(final_model_bf, iterations = 10000)
+posterior_samples_final <- posterior_samples_final[, !(colnames(posterior_samples_final) == "g")]
+
+
+
+```
+
+We select the model:
+$$
+Y = \beta_0\ + \beta_1\text{X}_1 + \beta_2\text{X}_2 + \beta_3\text{X}_3 + \beta_4\text{X}_4 + \epsilon,   \epsilon \sim N (0,\sigma^2)
+$$
+Where:
+
+  - Y (dependent variable) is Fertility  
+  
+  - $\text{X}_1$ (independent variable 1) is Agriculture
+  
+  - $\text{X}_2$ (independent variable 2) is Education
+  
+  - $\text{X}_3$ (independent variable 3) is Catholic  
+  
+  - $\text{X}_4$ (independent variable 4) is Infant.Mortality 
+  
+  - $\beta_i$ are the coefficients  
+  
+  - $\sigma^2$ is the error variance
+  
+  
+### Drawing Samples from the Posterior
+
+We can now draw some samples from the corresponding posterior. Some of the samples are shown below
+
+```{r samples, echo=FALSE}
+set.seed(2025)
+posterior_samples_final <- posterior(final_model_bf, iterations = 10000)
+
+posterior_samples_final <- posterior_samples_final[, !(colnames(posterior_samples_final) == "g")]
+
+head(posterior_samples_final)
+```
+### Histograms of Posterior Samples
+  
+```{r histos, echo=FALSE, fig.width=7.5, fig.height=4.2}
+par(mfrow=c(2,3))
+
+hist(posterior_samples_final[, "mu"], main = "Intercept", xlab = "Value", col = "lightblue", breaks = 30)
+hist(posterior_samples_final[, "Agriculture"], main = "Agriculture", xlab = "Value", col = "lightgreen", breaks = 30)
+hist(posterior_samples_final[, "Catholic"], main = "Catholic", xlab = "Value", col = "lightpink", breaks = 30)
+hist(posterior_samples_final[, "Education"], main = "Education", xlab = "Value", col = "lightyellow", breaks = 30)
+hist(posterior_samples_final[, "Infant.Mortality"], main = "Infant.Mortality", xlab = "Value", col = "orange", breaks = 30)
+
+```
+  
+  
+### Interpretation of Histograms
+
+All of the posterior distributions appear approximately normal. The histograms are reasonably tight, implying moderate certainty about parameter estimates. However, Agriculture shows more variability than the others, indicating greater uncertainty in its effect on Fertility.
+
+### Compute Estimates of Paramaters
+
+
+```{r Parameter Estimate, echo=FALSE}
+posterior_means <- apply(posterior_samples_final, 2, mean)
+posterior_sds <- apply(posterior_samples_final, 2, sd)
+
+posterior_summary <- data.frame(
+  Parameter = names(posterior_means),
+  Posterior_Mean = round(posterior_means, 4),
+  Posterior_SD = round(posterior_sds, 4)
+)
+
+posterior_summary
+```
+
+
+The posterior standard deviations quantify how much uncertainty remains.
+
+We observe:
+
+Education has a strong negative coefficient (~ -0.96), indicating that higher education is strongly associated with lower Fertility.
+
+Agriculture has a negative coefficient (~ -0.17), though smaller in magnitude.
+
+Catholic has a small positive coefficient (~ 0.13), indicating marginally higher Fertility in Catholic regions.
+
+Infant Mortality has a strong positive relationship (~ 1.19), suggesting higher Fertility accompanies higher infant mortality, which is logically reasonable.
+
+The Standard Deviation of the error term is high at 12.98 compared to its mean of 42.06 however this is a lot lower than in previous models using Catholic.Transform and Examination reassuring the strength of this model in comparison to those used in question 1 and 2.
+
+### Making Predictions for Fertility values using the Test Set
+
+Using our recently calculated posterior mean parameters, we now make Fertility predictions on the test set and compare these predictions with the actual values.
+
+```{r preidictions for Fertil Val, echo=FALSE}
+X_test <- model.matrix(~ Agriculture + Education + Catholic + Infant.Mortality, data = test_set)
+
+posterior_coef_names <- c("(Intercept)", "Agriculture", "Education", "Catholic", "Infant.Mortality")
+beta_post_means <- c(posterior_means["mu"], posterior_means["Agriculture"], posterior_means["Education"], 
+                     posterior_means["Catholic"], posterior_means["Infant.Mortality"])
+
+predicted_fertility <- X_test %*% beta_post_means
+
+prediction_results <- data.frame(
+  Actual = round(test_set$Fertility, 2),
+  Predicted = round(predicted_fertility, 2)
+)
+
+prediction_results
+
+```
+
+
+```{r RMSE, echo=FALSE}
+rmse_test <- sqrt(mean((prediction_results$Actual - prediction_results$Predicted)^2))
+
+```
+
+We can look at the Root Mean Squared Error to compute how accurate our model is. We find this to be `r round(rmse_test, 2)`
+This is a moderately low score relative to the range of Fertility values which indicates a moderately strong predictive performance.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
